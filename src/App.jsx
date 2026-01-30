@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { Container } from "react-bootstrap";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+import AppNavbar from "./components/AppNavbar";
 
+import Dashboard from "./pages/Dashboard";
+import Meals from "./pages/Meals";
+import Workouts from "./pages/Workouts";
+import Habits from "./pages/Habits";
+import Progress from "./pages/Progress";
+import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
+
+export default function App() {
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <AppNavbar />
+      <Container className="py-4">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/meals" element={<Meals />} />
+          <Route path="/workouts" element={<Workouts />} />
+          <Route path="/habits" element={<Habits />} />
+          <Route path="/progress" element={<Progress />} />
+          <Route path="/settings" element={<Settings />} />
 
-export default App
+          {/* optional redirect */}
+          <Route path="/home" element={<Navigate to="/" replace />} />
+
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Container>
+    </>
+  );
+}
