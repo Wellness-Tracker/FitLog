@@ -1,4 +1,25 @@
-// src/app/reducer.js
+// src/app/storage.js
+// Persistence functions for app state (using localStorage)
+
+const STORAGE_KEY = "fitlog_state";
+
+export function loadState() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    console.error("Failed to load state from localStorage:", error);
+    return null;
+  }
+}
+
+export function saveState(state) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error("Failed to save state to localStorage:", error);
+  }
+}
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -67,64 +88,3 @@ export const initialState = {
     waterGoalOz: 80,
   },
 };
-
-export function appReducer(state, action) {
-  switch (action.type) {
-    case "ADD_MEAL": {
-      return {
-        ...state,
-        meals: [action.payload, ...state.meals],
-      };
-    }
-    case "DELETE_MEAL": {
-      return {
-        ...state,
-        meals: state.meals.filter((m) => m.id !== action.payload),
-      };
-    }
-    case "ADD_WORKOUT": {
-      return {
-        ...state,
-        workouts: [action.payload, ...state.workouts],
-      };
-    }
-    case "DELETE_WORKOUT": {
-      return {
-        ...state,
-        workouts: state.workouts.filter((w) => w.id !== action.payload),
-      };
-    }
-    case "UPSERT_HABITS_FOR_DATE": {
-      const { date, habits } = action.payload;
-      const prevForDate = state.habitsByDate[date] || {};
-      return {
-        ...state,
-        habitsByDate: {
-          ...state.habitsByDate,
-          [date]: {
-            ...prevForDate,
-            ...habits,
-          },
-        },
-      };
-    }
-    case "UPDATE_SETTINGS": {
-      return {
-        ...state,
-        settings: {
-          ...state.settings,
-          ...action.payload,
-        },
-      };
-    }
-    case "HYDRATE_STATE": {
-      // Replace whole state from persisted data
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
-    default:
-      return state;
-  }
-}
