@@ -11,40 +11,24 @@ import {
 } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import PageShell from "../components/PageShell";
+import { useAppDispatch, useAppState } from "../app/store";
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export default function Meals() {
-  // --- Tier 3 local state (later: move to global state + localStorage)
-  const [meals, setMeals] = useState([
-    {
-      id: uuidv4(),
-      date: new Date().toISOString().slice(0, 10), // yyyy-mm-dd
-      time: "09:10",
-      type: "Breakfast",
-      name: "Oats + banana",
-      calories: 380,
-      protein: 18,
-    },
-    {
-      id: uuidv4(),
-      date: new Date().toISOString().slice(0, 10),
-      time: "13:25",
-      type: "Lunch",
-      name: "Dal rice + egg curry",
-      calories: 520,
-      protein: 22,
-    },
-  ]);
-
-  // --- UI state
-  const [showModal, setShowModal] = useState(false);
-
-  const today = new Date().toISOString().slice(0, 10);
+  const { meals } = useAppState();
+  const dispatch = useAppDispatch();
+  const today = todayStr();
 
   const [filters, setFilters] = useState({
     date: today,
     search: "",
     type: "All",
   });
+
+  const [showModal, setShowModal] = useState(false);
 
   const [form, setForm] = useState({
     date: today,
@@ -78,7 +62,6 @@ export default function Meals() {
 
   function addMeal(e) {
     e.preventDefault();
-
     if (!form.name.trim()) return;
 
     const caloriesNum = Number(form.calories);
@@ -94,12 +77,12 @@ export default function Meals() {
       protein: Number.isFinite(proteinNum) ? proteinNum : 0,
     };
 
-    setMeals((prev) => [newMeal, ...prev]);
+    dispatch({ type: "ADD_MEAL", payload: newMeal });
     setShowModal(false);
   }
 
   function deleteMeal(id) {
-    setMeals((prev) => prev.filter((m) => m.id !== id));
+    dispatch({ type: "DELETE_MEAL", payload: id });
   }
 
   const filteredMeals = useMemo(() => {
@@ -113,18 +96,17 @@ export default function Meals() {
           m.name.toLowerCase().includes(s) || m.type.toLowerCase().includes(s)
         );
       })
-      .sort((a, b) => (a.time < b.time ? 1 : -1)); // recent first
+      .sort((a, b) => (a.time < b.time ? 1 : -1));
   }, [meals, filters]);
 
   const totals = useMemo(() => {
-    const calories = filteredMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
-    const protein = filteredMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
+    const calories = filteredMeals.reduce((sum, m) => sum + (m.calories || 0), 0);
+    const protein = filteredMeals.reduce((sum, m) => sum + (m.protein || 0), 0);
     return { calories, protein };
   }, [filteredMeals]);
 
   return (
     <PageShell title="Meals" icon="bi-egg-fried">
-      {/* Top controls */}
       <Row className="g-2 align-items-end mb-3">
         <Col md={3}>
           <Form.Label className="text-muted small">Date</Form.Label>
@@ -177,7 +159,6 @@ export default function Meals() {
         </Col>
       </Row>
 
-      {/* Totals */}
       <div className="d-flex flex-wrap gap-2 mb-3">
         <Badge bg="secondary" className="px-3 py-2">
           Meals: {filteredMeals.length}
@@ -190,7 +171,6 @@ export default function Meals() {
         </Badge>
       </div>
 
-      {/* Table */}
       <Table responsive hover className="mb-0 align-middle">
         <thead>
           <tr>
@@ -242,7 +222,6 @@ export default function Meals() {
         </tbody>
       </Table>
 
-      {/* Add Meal Modal */}
       <Modal show={showModal} onHide={closeModal} centered>
         <Form onSubmit={addMeal}>
           <Modal.Header closeButton>

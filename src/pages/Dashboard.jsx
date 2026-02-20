@@ -1,85 +1,94 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Badge, Card, Col, ProgressBar, Row, Table } from "react-bootstrap";
 import SummaryCard from "../components/SummaryCard";
+import { useAppState } from "../app/store";
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export default function Dashboard() {
-  // Sample data (Tier 1). Tier 4 will replace with global state.
-  const today = {
-    caloriesIn: 1650,
-    caloriesBurned: 420,
-    steps: 7200,
-    waterOz: 52,
-    sleepHrs: 6.8,
-    calorieGoal: 1900,
-    stepGoal: 9000,
-    waterGoalOz: 80,
-    sleepGoalHrs: 8,
-  };
+  const state = useAppState();
+  const today = todayStr();
 
-  const meals = [
-    { time: "9:10 AM", name: "Oats + berries", calories: 380, protein: 18 },
-    { time: "1:25 PM", name: "Chicken salad", calories: 520, protein: 42 },
-    { time: "7:40 PM", name: "Paneer wrap", calories: 520, protein: 30 },
-  ];
+  const todayMeals = state.meals.filter((m) => m.date === today);
+  const todayWorkouts = state.workouts.filter((w) => w.date === today);
+  const habits = state.habitsByDate[today] || {};
 
-  const workouts = [
-    { time: "6:30 PM", name: "Strength (Upper)", duration: 45, calories: 280 },
-    { time: "8:10 PM", name: "Walk", duration: 20, calories: 140 },
-  ];
+  const totals = useMemo(() => {
+    const caloriesIn = todayMeals.reduce((sum, m) => sum + (m.calories || 0), 0);
+    const protein = todayMeals.reduce((sum, m) => sum + (m.protein || 0), 0);
+    const caloriesBurned = todayWorkouts.reduce(
+      (sum, w) => sum + (w.caloriesBurned || 0),
+      0
+    );
+    const steps = habits.steps || 0;
+    const waterOz = habits.waterOz || 0;
+    const sleepHrs = habits.sleepHrs || 0;
 
-  const net = today.caloriesIn - today.caloriesBurned;
-  const pct = (value, goal) => Math.min(100, Math.round((value / goal) * 100));
+    return {
+      caloriesIn,
+      protein,
+      caloriesBurned,
+      steps,
+      waterOz,
+      sleepHrs,
+    };
+  }, [todayMeals, todayWorkouts, habits]);
+
+  const goals = state.settings;
+  const net = totals.caloriesIn - totals.caloriesBurned;
+
+  const pct = (value, goal) =>
+    goal > 0 ? Math.min(100, Math.round((value / goal) * 100)) : 0;
 
   return (
     <div className="d-flex flex-column gap-3">
-      {/* Header */}
       <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
           <h1 className="h3 m-0">Dashboard</h1>
-          <div className="text-muted">Today snapshot (sample data for Tier 1)</div>
+          <div className="text-muted">Today snapshot based on your logs</div>
         </div>
         <Badge bg={net <= 0 ? "success" : "warning"} className="px-3 py-2">
           Net: {net} cal {net <= 0 ? "(deficit)" : "(surplus)"}
         </Badge>
       </div>
 
-      {/* Summary cards */}
       <Row className="g-3">
         <Col xs={12} md={6} lg={3}>
           <SummaryCard
             title="Calories In"
-            value={`${today.caloriesIn} cal`}
-            subtext={`Goal ${today.calorieGoal}`}
+            value={`${totals.caloriesIn} cal`}
+            subtext={`Goal ${goals.calorieGoal}`}
             icon="bi-fire"
           />
         </Col>
         <Col xs={12} md={6} lg={3}>
           <SummaryCard
             title="Calories Burned"
-            value={`${today.caloriesBurned} cal`}
-            subtext="Workouts + steps"
+            value={`${totals.caloriesBurned} cal`}
+            subtext="Workouts + movement"
             icon="bi-lightning-charge"
           />
         </Col>
         <Col xs={12} md={6} lg={3}>
           <SummaryCard
             title="Steps"
-            value={`${today.steps}`}
-            subtext={`Goal ${today.stepGoal}`}
+            value={`${totals.steps}`}
+            subtext={`Goal ${goals.stepGoal}`}
             icon="bi-person-walking"
           />
         </Col>
         <Col xs={12} md={6} lg={3}>
           <SummaryCard
             title="Sleep"
-            value={`${today.sleepHrs} hrs`}
-            subtext={`Goal ${today.sleepGoalHrs} hrs`}
+            value={`${totals.sleepHrs.toFixed(1)} hrs`}
+            subtext={`Goal ${goals.sleepGoal} hrs`}
             icon="bi-moon-stars"
           />
         </Col>
       </Row>
 
-      {/* Progress bars */}
       <Row className="g-3">
         <Col xs={12} lg={6}>
           <Card className="shadow-sm h-100">
@@ -89,36 +98,36 @@ export default function Dashboard() {
               <div className="d-flex justify-content-between">
                 <span className="text-muted">Calories</span>
                 <span className="text-muted">
-                  {today.caloriesIn}/{today.calorieGoal}
+                  {totals.caloriesIn}/{goals.calorieGoal}
                 </span>
               </div>
               <ProgressBar
-                now={pct(today.caloriesIn, today.calorieGoal)}
-                label={`${pct(today.caloriesIn, today.calorieGoal)}%`}
+                now={pct(totals.caloriesIn, goals.calorieGoal)}
+                label={`${pct(totals.caloriesIn, goals.calorieGoal)}%`}
                 className="mb-3"
               />
 
               <div className="d-flex justify-content-between">
                 <span className="text-muted">Steps</span>
                 <span className="text-muted">
-                  {today.steps}/{today.stepGoal}
+                  {totals.steps}/{goals.stepGoal}
                 </span>
               </div>
               <ProgressBar
-                now={pct(today.steps, today.stepGoal)}
-                label={`${pct(today.steps, today.stepGoal)}%`}
+                now={pct(totals.steps, goals.stepGoal)}
+                label={`${pct(totals.steps, goals.stepGoal)}%`}
                 className="mb-3"
               />
 
               <div className="d-flex justify-content-between">
                 <span className="text-muted">Water (oz)</span>
                 <span className="text-muted">
-                  {today.waterOz}/{today.waterGoalOz}
+                  {totals.waterOz}/{goals.waterGoalOz}
                 </span>
               </div>
               <ProgressBar
-                now={pct(today.waterOz, today.waterGoalOz)}
-                label={`${pct(today.waterOz, today.waterGoalOz)}%`}
+                now={pct(totals.waterOz, goals.waterGoalOz)}
+                label={`${pct(totals.waterOz, goals.waterGoalOz)}%`}
               />
             </Card.Body>
           </Card>
@@ -129,17 +138,15 @@ export default function Dashboard() {
             <Card.Body>
               <Card.Title className="mb-3">Today Notes</Card.Title>
               <ul className="mb-0">
-                <li>Use the navbar to view Meals / Workouts / Habits pages.</li>
-                <li>Tier 1 = styled dashboard + organized data.</li>
-                <li>Tier 2 = routing across pages with URL changes.</li>
-                <li>Tier 4 later will add real global state + forms.</li>
+                <li>Log meals and workouts to keep this dashboard accurate.</li>
+                <li>Update water, steps, and sleep in the Habits page.</li>
+                <li>Adjust your targets from the Settings page.</li>
               </ul>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* Tables */}
       <Row className="g-3">
         <Col xs={12} lg={6}>
           <Card className="shadow-sm">
@@ -155,14 +162,22 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {meals.map((m, idx) => (
-                    <tr key={idx}>
-                      <td>{m.time}</td>
-                      <td>{m.name}</td>
-                      <td className="text-end">{m.calories}</td>
-                      <td className="text-end">{m.protein}</td>
+                  {todayMeals.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="text-center text-muted py-3">
+                        No meals logged yet for today.
+                      </td>
                     </tr>
-                  ))}
+                  ) : (
+                    todayMeals.map((m) => (
+                      <tr key={m.id}>
+                        <td>{m.time}</td>
+                        <td>{m.name}</td>
+                        <td className="text-end">{m.calories}</td>
+                        <td className="text-end">{m.protein}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </Table>
             </Card.Body>
@@ -183,14 +198,22 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {workouts.map((w, idx) => (
-                    <tr key={idx}>
-                      <td>{w.time}</td>
-                      <td>{w.name}</td>
-                      <td className="text-end">{w.duration} min</td>
-                      <td className="text-end">{w.calories} cal</td>
+                  {todayWorkouts.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="text-center text-muted py-3">
+                        No workouts logged yet for today.
+                      </td>
                     </tr>
-                  ))}
+                  ) : (
+                    todayWorkouts.map((w) => (
+                      <tr key={w.id}>
+                        <td>{w.time}</td>
+                        <td>{w.name}</td>
+                        <td className="text-end">{w.durationMin} min</td>
+                        <td className="text-end">{w.caloriesBurned} cal</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </Table>
             </Card.Body>
