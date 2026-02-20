@@ -14,24 +14,27 @@ import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
-    <>
+    <div className="app-shell">
       <AppNavbar />
-      <Container className="py-4">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/meals" element={<Meals />} />
-          <Route path="/workouts" element={<Workouts />} />
-          <Route path="/habits" element={<Habits />} />
-          <Route path="/progress" element={<Progress />} />
-          <Route path="/settings" element={<Settings />} />
 
-          {/* optional redirect */}
-          <Route path="/home" element={<Navigate to="/" replace />} />
+      <main className="app-main">
+        <Container fluid="lg" className="py-4">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/meals" element={<Meals />} />
+            <Route path="/workouts" element={<Workouts />} />
+            <Route path="/habits" element={<Habits />} />
+            <Route path="/progress" element={<Progress />} />
+            <Route path="/settings" element={<Settings />} />
 
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Container>
-    </>
+            {/* optional redirect */}
+            <Route path="/home" element={<Navigate to="/" replace />} />
+
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Container>
+      </main>
+    </div>
   );
 }
