@@ -66,3 +66,328 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* ============================================
+   ANIMATIONS - CSS Animations for Performance
+   ============================================ */
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide In From Left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide In From Right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide In From Top */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide In From Bottom */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Glow Animation */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(100, 108, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(100, 108, 255, 0.8);
+  }
+}
+
+/* Rotate Animation */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Shimmer Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Heart Beat Animation */
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
+/* Flip Animation */
+@keyframes flip {
+  from {
+    transform: perspective(400px) rotateY(0);
+  }
+  to {
+    transform: perspective(400px) rotateY(360deg);
+  }
+}
+
+/* Utility Classes */
+
+/* Fade animations */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Slide animations */
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.4s ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.4s ease-out;
+}
+
+/* Scale animations */
+.animate-scale-in {
+  animation: scaleIn 0.4s ease-out;
+}
+
+/* Pulse animations */
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Bounce animations */
+.animate-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* Glow animations */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Rotate animations */
+.animate-rotate {
+  animation: rotate 1s linear infinite;
+}
+
+/* Heart beat animations */
+.animate-heartbeat {
+  animation: heartBeat 1.3s ease-in-out infinite;
+}
+
+/* Flip animations */
+.animate-flip {
+  animation: flip 0.6s ease-in-out;
+}
+
+/* Shimmer loading */
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Page transition animations */
+.page-enter {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.page-exit {
+  animation: slideInUp 0.3s ease-in reverse;
+}
+
+/* Smooth transitions for common elements */
+button,
+a,
+.btn,
+.form-control,
+input,
+select,
+textarea {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced hover effects */
+button:hover,
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Card hover animations */
+.card {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Form input focus animations */
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 0.2rem rgba(100, 108, 255, 0.25);
+}
+
+/* Badge animations */
+.badge {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Progress bar animations */
+.progress-bar {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+/* Modal animations */
+.modal {
+  animation: slideInDown 0.3s ease-out;
+}
+
+.modal-backdrop {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* List item stagger animations */
+.list-item {
+  animation: slideInUp 0.4s ease-out backwards;
+}
+
+.list-item:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.list-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.list-item:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.list-item:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.list-item:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
