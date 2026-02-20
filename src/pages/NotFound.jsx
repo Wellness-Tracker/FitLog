@@ -6,7 +6,9 @@ import PageShell from "../components/PageShell";
 export default function NotFound() {
   return (
     <PageShell title="Page not found" icon="bi-exclamation-triangle">
-      <p className="text-muted">The page you’re looking for doesn’t exist.</p>
+      <p className="text-muted">
+        The page you’re looking for doesn’t exist.
+      </p>
       <Button as={Link} to="/" variant="primary">
         Back to Dashboard
       </Button>
