@@ -11,40 +11,24 @@ import {
 } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import PageShell from "../components/PageShell";
+import { useAppDispatch, useAppState } from "../app/store";
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export default function Workouts() {
-  // --- Tier 3 local state (later: move to global state + localStorage)
-  const [workouts, setWorkouts] = useState([
-    {
-      id: uuidv4(),
-      date: new Date().toISOString().slice(0, 10), // yyyy-mm-dd
-      time: "18:30",
-      type: "Strength",
-      name: "Upper Body (Machines + DB)",
-      durationMin: 45,
-      caloriesBurned: 280,
-    },
-    {
-      id: uuidv4(),
-      date: new Date().toISOString().slice(0, 10),
-      time: "20:10",
-      type: "Cardio",
-      name: "Incline Walk",
-      durationMin: 20,
-      caloriesBurned: 140,
-    },
-  ]);
-
-  // --- UI state
-  const [showModal, setShowModal] = useState(false);
-
-  const today = new Date().toISOString().slice(0, 10);
+  const { workouts } = useAppState();
+  const dispatch = useAppDispatch();
+  const today = todayStr();
 
   const [filters, setFilters] = useState({
     date: today,
     search: "",
     type: "All",
   });
+
+  const [showModal, setShowModal] = useState(false);
 
   const [form, setForm] = useState({
     date: today,
@@ -93,12 +77,12 @@ export default function Workouts() {
       caloriesBurned: Number.isFinite(burnedNum) ? burnedNum : 0,
     };
 
-    setWorkouts((prev) => [newWorkout, ...prev]);
+    dispatch({ type: "ADD_WORKOUT", payload: newWorkout });
     setShowModal(false);
   }
 
   function deleteWorkout(id) {
-    setWorkouts((prev) => prev.filter((w) => w.id !== id));
+    dispatch({ type: "DELETE_WORKOUT", payload: id });
   }
 
   const filteredWorkouts = useMemo(() => {
@@ -117,17 +101,16 @@ export default function Workouts() {
 
   const totals = useMemo(() => {
     const minutes = filteredWorkouts.reduce(
-      (acc, w) => acc + (w.durationMin || 0),
+      (sum, w) => sum + (w.durationMin || 0),
       0
     );
     const burned = filteredWorkouts.reduce(
-      (acc, w) => acc + (w.caloriesBurned || 0),
+      (sum, w) => sum + (w.caloriesBurned || 0),
       0
     );
     return { minutes, burned };
   }, [filteredWorkouts]);
 
-  // helper for nice pill color
   const typeBadge = (type) => {
     if (type === "Cardio") return { bg: "info", text: "dark" };
     if (type === "Strength") return { bg: "primary", text: "light" };
@@ -137,7 +120,6 @@ export default function Workouts() {
 
   return (
     <PageShell title="Workouts" icon="bi-lightning-charge">
-      {/* Top controls */}
       <Row className="g-2 align-items-end mb-3">
         <Col md={3}>
           <Form.Label className="text-muted small">Date</Form.Label>
@@ -191,7 +173,6 @@ export default function Workouts() {
         </Col>
       </Row>
 
-      {/* Totals */}
       <div className="d-flex flex-wrap gap-2 mb-3">
         <Badge bg="secondary" className="px-3 py-2">
           Workouts: {filteredWorkouts.length}
@@ -204,7 +185,6 @@ export default function Workouts() {
         </Badge>
       </div>
 
-      {/* Table */}
       <Table responsive hover className="mb-0 align-middle">
         <thead>
           <tr>
@@ -261,7 +241,6 @@ export default function Workouts() {
         </tbody>
       </Table>
 
-      {/* Add Workout Modal */}
       <Modal show={showModal} onHide={closeModal} centered>
         <Form onSubmit={addWorkout}>
           <Modal.Header closeButton>
