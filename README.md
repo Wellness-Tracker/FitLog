@@ -66,4 +66,6 @@ WireFrame
 
 
 Deployment Link - https://fitlogg-qssq.onrender.com/
+YOUTUBE LINK -https://youtu.be/_uhPDR3lCH4
+
 
